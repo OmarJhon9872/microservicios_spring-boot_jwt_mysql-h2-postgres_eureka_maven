@@ -1,0 +1,41 @@
+docker pull postgres:latest
+docker run --name postgresJon -e POSTGRES_PASSWORD=12345678 -d -p 5432:5432 postgres:latest
+docker exec -it postgresJon bash
+ psql -U postgres
+\du # Permisos
+ create database inmueble;
+\l # Listar dbs
+\c inmueble # Conectar dbs
+\d # Tables
+
+# Se crea el rol para la conexion 
+postgres=# create role admin with
+postgres-# login
+postgres-# superuser
+postgres-# createdb
+postgres-# createrole
+postgres-# inherit
+postgres-# replication
+postgres-# connection limit -1
+postgres-# password 'admin123';
+*** CREATE ROLE
+
+# Se crea la base de datos relacionada al usuario creado
+postgres=# create database db_inmueble
+postgres-# with
+postgres-# owner=admin
+postgres-# encoding='UTF8'
+postgres-# connection limit = -1;
+*** CREATE DATABASE
+
+# Se accede a la instancia de la nueva base de datos creada
+psql -U admin -d db_inmueble
+
+
+# Se crea el schema de trabajo para la base de datos
+db_inmueble=# CREATE SCHEMA sc_inmueble
+db_inmueble-# authorization admin;
+*** CREATE SCHEMA
+
+\dn # Ver schemas
+58242ed6-ecc8-4f03-afbb-78d176d02bb1 pass spring security
