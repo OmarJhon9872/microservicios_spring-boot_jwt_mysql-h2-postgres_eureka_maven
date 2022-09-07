@@ -9,6 +9,7 @@ package com.jonOmar.microservice3gateway.service;
 import com.jonOmar.microservice3gateway.model.Role;
 import com.jonOmar.microservice3gateway.model.User;
 import com.jonOmar.microservice3gateway.repository.UserRepository;
+import com.jonOmar.microservice3gateway.security.jwt.JwtProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -26,11 +27,23 @@ public class UserServiceImpl implements UserService{
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private JwtProvider jwtProvider;
+
     @Override
     public User saveUser(User user){
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRole(Role.USER);
         user.setFechaCreacion(LocalDateTime.now());
+
+        /*################ PASO 16 security/jwt/JwtProviderImpl ######################*/
+        User userCreated = userRepository.save(user);
+
+        /*Como el token a devolver se genera desde un provider se inyecta en la clase
+        * con el nombre de jwtProvider, se genera y se adjunta al objeto a devolver en el request*/
+        String jwt = jwtProvider.generateToken(userCreated);
+        userCreated.setToken(jwt);
+        /*################ FIN PASO 16 security/jwt/JwtProviderImpl ######################*/
 
         return userRepository.save(user);
     }

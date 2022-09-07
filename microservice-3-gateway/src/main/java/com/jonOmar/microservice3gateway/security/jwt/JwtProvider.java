@@ -1,5 +1,6 @@
 package com.jonOmar.microservice3gateway.security.jwt;
 
+import com.jonOmar.microservice3gateway.model.User;
 import com.jonOmar.microservice3gateway.security.UserPrincipal;
 import org.springframework.security.core.Authentication;
 
@@ -11,4 +12,8 @@ public interface JwtProvider {
     Authentication getAuthentication(HttpServletRequest request);
 
     boolean isTokenValid(HttpServletRequest request);
+
+    /*#######################################################*/
+    /*Tercera parte de implementacion en PASO 16*/
+    String generateToken(User user);
 }

@@ -21,8 +21,19 @@ package com.jonOmar.microservice3gateway.security.jwt;
 * mismo que contendra la construccion del UserDetails que personalizamos en security/UserPrincipal,
 * solo en caso de que el token sea validado correctamente.
 * - Finalmente verificamos que el token sea valido en cuestion a expiracion con isTokenValid()
+* - La composicion de un JWT token se divide en 3 partes:
+    1 es la información del encabezado (Encabezado)
+    2 es la carga útil (Carga útil)
+    3 es la firma (Firma).
 * - Pasar a PASO 12 en security/jwt/JwtAuthorizationFilter*/
 
+/*PASO 16: prev:controller/UserController
+*
+* - Generamos el metodo generateToken(User user) que recibe una instancia de user y segun
+* los datos recibidos creara un token para devolver al usuario tras la creacion de un nuevo
+* usuario
+* - Pasar a PASO 17 en: service/UserServiceImpl*/
+import com.jonOmar.microservice3gateway.model.User;
 import com.jonOmar.microservice3gateway.security.UserPrincipal;
 import com.jonOmar.microservice3gateway.utils.SecurityUtils;
 import io.jsonwebtoken.Claims;
@@ -68,6 +79,11 @@ public class JwtProviderImpl implements JwtProvider{
         Key key = Keys.hmacShaKeyFor(JWT_SECRET.getBytes(StandardCharsets.UTF_8));
 
         /*Claims son propiedades de un token*/
+        /*La composicion de un JWT token se divide en 3 partes:
+            1 es la información del encabezado (Encabezado)
+            2 es la carga útil (Carga útil)
+            3 es la firma (Firma).
+        */
         return Jwts.builder()
                 .setSubject(auth.getUsername())
                 .claim("roles", authorities)
@@ -91,7 +107,7 @@ public class JwtProviderImpl implements JwtProvider{
         return Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
-                .parseClaimsJwt(token)
+                .parseClaimsJws(token)
                 .getBody();
     }
 
@@ -141,6 +157,22 @@ public class JwtProviderImpl implements JwtProvider{
     @Bean
     public JwtAuthorizationFilter jwtAuthorizationFilter(){
         return new JwtAuthorizationFilter();
+    }
+
+
+    /*#######################################################*/
+    /*Tercera parte de implementacion en PASO 16*/
+    @Override
+    public String generateToken(User user){
+        Key key = Keys.hmacShaKeyFor(JWT_SECRET.getBytes(StandardCharsets.UTF_8));
+
+        return Jwts.builder()
+                .setSubject(user.getUsername())
+                .claim("roles", user.getRole())
+                .claim("userId", user.getId())
+                .setExpiration(new Date(System.currentTimeMillis() + JWT_EXPIRATION_IN_MS))
+                .signWith(key, SignatureAlgorithm.HS512)
+                .compact();
     }
 
 }

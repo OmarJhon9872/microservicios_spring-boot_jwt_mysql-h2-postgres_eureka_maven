@@ -5,7 +5,8 @@ package com.jonOmar.microservice3gateway.service;
 * un campo @Transient String token en el modelo "User" como medio de almacenamiento
 * temporal
 * - Cuando la autenticacion se efectua se devuelve al usuario con el token
-* almacenado de forma temporal*/
+* almacenado de forma temporal
+* - Pasamos al PASO 14 controller/AuthenticationController */
 
 import com.jonOmar.microservice3gateway.model.User;
 import com.jonOmar.microservice3gateway.security.UserPrincipal;
