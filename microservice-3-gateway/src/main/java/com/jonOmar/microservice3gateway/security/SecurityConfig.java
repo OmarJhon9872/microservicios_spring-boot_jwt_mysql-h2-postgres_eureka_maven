@@ -12,10 +12,21 @@ package com.jonOmar.microservice3gateway.security;
 * que se han estado llevando a cabo en pasos anteriores
 * - Pasar a PASO 9 en application.properties */
 
+/*PASO 22: prev:controller/InmuebleController
+*
+* - Se redefine la autorizacion en ############# PASO 22 ###############
+* - Adecuanto el acceso libre al listado de inmuebles pero a la proteccion mediante roles
+* de la creacion y eliminacion de un inmueble
+* - Definimos la url ruta del microservicio de compras en el archivo application.properties
+* - compras.service.url
+* - Pasar a PASO 23 en request/CompraServiceRequest*/
+
+import com.jonOmar.microservice3gateway.model.Role;
 import com.jonOmar.microservice3gateway.security.jwt.JwtAuthorizationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -65,25 +76,42 @@ public class SecurityConfig {
         * con la instancia de customUserDetailsService posee los atributos e instancias de UserDetails*/
         AuthenticationManager authenticationManager = authManBuilder.build();
 
-        /*Definicion de proteccion de rutas paths de la aplicacion por parte de HttpSecurity de SpringSecurity*/
-        httpSecurity
-            .csrf()
-            .disable()
-            .cors()
-            .disable()
-            .authorizeHttpRequests()
-            .antMatchers("api/authentication/sign-in", "api/authentication/sign-up")
-            .permitAll()
-            .and()
-            .authenticationManager(authenticationManager)
-                /*Creado en PASO 12 security/jwt/JwtAuthorizationFiler*/
-            .addFilterBefore(jwtAuthorizationFiler(), UsernamePasswordAuthenticationFilter.class)
-            .sessionManagement()
 
-                /*ALWAYS Crea siempre unHttpSession*/
-                /*STATELESS Spring Security nunca creará HttpSession y nunca lo usará para obtener el SecurityContext*/
-                /*NEVER Spring Security nunca creará un HttpSession, pero usará el HttpSessionsi ya existe*/
-            .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        /*############# PASO 22 ############### redefinicion de objeto httpSecurity*/
+        httpSecurity.cors();
+        httpSecurity.csrf().disable();
+        httpSecurity.authenticationManager(authenticationManager);
+        httpSecurity.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        /*############# FIN PASO 22 ############### redefinicion de objeto httpSecurity*/
+
+        /*Definicion de proteccion de rutas paths de la aplicacion por parte de HttpSecurity de SpringSecurity*/
+        httpSecurity.authorizeHttpRequests()
+            .antMatchers("/api/authentication/sign-in", "/api/authentication/sign-up")
+            .permitAll()
+
+
+
+                /*############# PASO 22 ############### redefinicion de objeto httpSecurity*/
+                .antMatchers(HttpMethod.GET, "/gateway/inmueble").permitAll()
+                .antMatchers("/gateway/inmueble/**").hasRole(Role.ADMIN.name())
+                .anyRequest().authenticated();
+
+        httpSecurity.addFilterBefore(jwtAuthorizationFiler(), UsernamePasswordAuthenticationFilter.class);
+                /*############# PASO 22 ############### redefinicion de objeto httpSecurity
+                * SE BORRA LO SIGUIENTE DEBIDO A QUE LAS CONFIGURACIONES JWT SE ESTABLECIERON AL IGUAL
+                * QUE LOS DEMAS PARAMETROS DE ADMINISTRACION DE SESION Y POLITICAS*/
+                /*.and()
+                .authenticationManager(authenticationManager)
+                    *//*Creado en PASO 12 security/jwt/JwtAuthorizationFiler*//*
+                .addFilterBefore(jwtAuthorizationFiler(), UsernamePasswordAuthenticationFilter.class)
+                .sessionManagement()
+
+                    *//*ALWAYS Crea siempre unHttpSession*//*
+                    *//*STATELESS Spring Security nunca creará HttpSession y nunca lo usará para obtener el SecurityContext*//*
+                    *//*NEVER Spring Security nunca creará un HttpSession, pero usará el HttpSessionsi ya existe*//*
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);*/
+
+
 
         return httpSecurity.build();
     }

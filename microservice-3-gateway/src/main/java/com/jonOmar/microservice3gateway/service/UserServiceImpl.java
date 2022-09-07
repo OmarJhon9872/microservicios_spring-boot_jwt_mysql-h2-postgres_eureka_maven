@@ -6,6 +6,13 @@ package com.jonOmar.microservice3gateway.service;
 * - Metodo saveUser para creacion de usuario con parametros requeridos
 * - Pasar a security/CustomUserDetailsService en PASO 4*/
 
+/*PASO 17: prev:security/jwt/JwtProviderImpl
+*
+* Se agrego la seccion ################ PASO 16 security/jwt/JwtProviderImpl ######################
+* Se colocan las mismas claves para los 3 microservicios en el archivo de properties:
+* - service.sercurity.secure-key-username=omar
+* - service.sercurity.secure-key-password=1234
+* - Tras ello a configurar el cliente de Feign en PASO 18 request/FeignConfiguration*/
 import com.jonOmar.microservice3gateway.model.Role;
 import com.jonOmar.microservice3gateway.model.User;
 import com.jonOmar.microservice3gateway.repository.UserRepository;
